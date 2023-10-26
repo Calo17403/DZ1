@@ -1,0 +1,44 @@
+/*
+###############VASHNO##############
+Результат разный так как два потока работают одновременно и у них разная скорость, поэтому они несинхронизированно выполняют функцию. 
+Чтобы это исправить нужно добавить слово synchronized в методе increment. Добавив это слово будет работать только один поток, 
+а второй будет ждать, когда первый закончит.
+
+*/
+class Counter {
+    int Count;
+public synchronized void increment() {
+    Count++;
+    }
+
+   public int getValue() {
+    return Count;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Counter counter = new Counter();
+
+        Thread thread1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+            }
+        });
+        Thread thread2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) {
+                counter.increment();
+            }
+        });
+        thread1.start();
+        thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(counter.getValue());
+    }
+}
